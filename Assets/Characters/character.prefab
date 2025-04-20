@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3556329564193112204}
   m_Layer: 0
-  m_Name: character prefab
+  m_Name: character
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -85,7 +85,8 @@ PrefabInstance:
       value: character
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 65702495048144492, guid: f0b8373a9777f486b8c48fbdbdbb7522, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f0b8373a9777f486b8c48fbdbdbb7522, type: 3}
