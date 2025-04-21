@@ -4,16 +4,46 @@ using UnityEngine.XR.ARSubsystems;
 
 public class PlaneVisualizer : MonoBehaviour
 {
-    ARPlaneManager _planeManager;
-    Material _floorMat, _wallMat;
+    [SerializeField]
+    private Material floorMat, wallMat;
+
+    [SerializeField]
+    private GameObject characterPrefab;
+
+    [SerializeField]
+    private bool enableCharacterPlacement = true;
+
+    private ARPlaneManager _planeManager;
+    private CharacterPlacer _characterPlacer;
 
     void Awake()
     {
-        _floorMat = Resources.Load<Material>("ARPlane/FeatheredPlaneMaterial");
-        _wallMat = _floorMat; // fallback to same if needed
+        if (floorMat == null)
+            floorMat = Resources.Load<Material>("ARPlane/FeatheredPlaneMaterial");
 
-        if (_floorMat == null) Debug.LogError("[PlaneVisualizer] FloorMaterial not found!");
-        if (_wallMat == null) Debug.LogError("[PlaneVisualizer] WallMaterial not found!");
+        if (wallMat == null)
+            wallMat = floorMat; // fallback to same if needed
+
+        if (floorMat == null) Debug.LogError("[PlaneVisualizer] FloorMaterial not found!");
+        if (wallMat == null) Debug.LogError("[PlaneVisualizer] WallMaterial not found!");
+
+        // Add CharacterPlacer component if needed
+        if (enableCharacterPlacement)
+        {
+            _characterPlacer = gameObject.GetComponent<CharacterPlacer>();
+            if (_characterPlacer == null)
+                _characterPlacer = gameObject.AddComponent<CharacterPlacer>();
+
+            // Set the character prefab if it's assigned here
+            if (characterPrefab != null)
+            {
+                // Use reflection to set the private field since it's SerializeField
+                var fieldInfo = typeof(CharacterPlacer).GetField("characterPrefab",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (fieldInfo != null)
+                    fieldInfo.SetValue(_characterPlacer, characterPrefab);
+            }
+        }
     }
 
     void OnEnable()
@@ -29,15 +59,17 @@ public class PlaneVisualizer : MonoBehaviour
 #pragma warning disable CS0618
         _planeManager.planesChanged += OnPlanesChanged;
 #pragma warning restore CS0618
-
         Debug.Log("[PlaneVisualizer] Started listening for planes...");
     }
 
     void OnDisable()
     {
+        if (_planeManager != null)
+        {
 #pragma warning disable CS0618
-        _planeManager.planesChanged -= OnPlanesChanged;
+            _planeManager.planesChanged -= OnPlanesChanged;
 #pragma warning restore CS0618
+        }
     }
 
 #pragma warning disable CS0618
@@ -46,7 +78,6 @@ public class PlaneVisualizer : MonoBehaviour
         foreach (var plane in args.added)
         {
             Debug.Log($"[PlaneVisualizer] New plane {plane.trackableId} alignment {plane.alignment}");
-
             if (!plane.TryGetComponent<MeshFilter>(out _))
                 plane.gameObject.AddComponent<MeshFilter>();
 
@@ -62,13 +93,13 @@ public class PlaneVisualizer : MonoBehaviour
             switch (plane.alignment)
             {
                 case PlaneAlignment.HorizontalUp:
-                    mr.material = _floorMat;
+                    mr.material = floorMat;
                     break;
                 case PlaneAlignment.Vertical:
-                    mr.material = _wallMat;
+                    mr.material = wallMat;
                     break;
                 default:
-                    mr.material = _floorMat; // fallback material
+                    mr.material = floorMat; // fallback material
                     break;
             }
 

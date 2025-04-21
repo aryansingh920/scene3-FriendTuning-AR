@@ -218,6 +218,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   resourcePath: Characters/character
+  _raycastManager: {fileID: 0}
+  _characterPrefab: {fileID: 0}
 --- !u!1 &659742729
 GameObject:
   m_ObjectHideFlags: 0
@@ -581,6 +583,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd0d8d11c59d44da89e5613d8857d5c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  floorMat: {fileID: 2100000, guid: 15645386c254043b19999018292a909b, type: 2}
+  wallMat: {fileID: 2100000, guid: 483a449aec3d44feb95fcf631ee3fb35, type: 2}
+  characterPrefab: {fileID: 1431720011828904642, guid: 05af2bb21746544efa88afd37a3d28c4, type: 3}
+  enableCharacterPlacement: 1
 --- !u!4 &1392089545
 Transform:
   m_ObjectHideFlags: 0
