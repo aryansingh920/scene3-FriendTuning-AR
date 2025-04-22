@@ -116,6 +116,8 @@ public class CharacterPlacer : MonoBehaviour
                 Debug.LogWarning("[CharacterPlacer] Update: DebugMaterial not loaded, cube will use default.");
             }
 
+            cube.AddComponent<BoxCollider>(); // this works if manually added like this
+
             // Add physics
             Rigidbody rb = cube.AddComponent<Rigidbody>();
             rb.mass = 1f;

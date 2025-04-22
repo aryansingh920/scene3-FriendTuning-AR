@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using System.Collections;
 
 public class PlaneVisualizer : MonoBehaviour
 {
@@ -129,21 +130,17 @@ public class PlaneVisualizer : MonoBehaviour
     {
         foreach (var plane in args.added)
         {
-            // Ensure MeshFilter exists
             if (!plane.TryGetComponent<MeshFilter>(out _))
                 plane.gameObject.AddComponent<MeshFilter>();
 
-            // Ensure ARPlaneMeshVisualizer exists
             var viz = plane.GetComponent<ARPlaneMeshVisualizer>();
             if (viz == null)
                 viz = plane.gameObject.AddComponent<ARPlaneMeshVisualizer>();
 
-            // Ensure MeshRenderer exists
             var mr = plane.GetComponent<MeshRenderer>();
             if (mr == null)
                 mr = plane.gameObject.AddComponent<MeshRenderer>();
 
-            // Assign material based on alignment
             switch (plane.alignment)
             {
                 case PlaneAlignment.HorizontalUp:
@@ -160,23 +157,29 @@ public class PlaneVisualizer : MonoBehaviour
             mr.enabled = true;
             viz.enabled = true;
 
-            // Ensure MeshCollider exists
-            var collider = plane.GetComponent<MeshCollider>();
-            if (collider == null)
-                collider = plane.gameObject.AddComponent<MeshCollider>();
-
-            // Assign mesh to collider if available
-            if (viz.mesh != null)
-            {
-                collider.sharedMesh = viz.mesh;
-                collider.convex = false; // Convex false for static mesh collider
-            }
-            else
-            {
-                Debug.LogWarning($"[PlaneVisualizer] Plane '{plane.trackableId}' mesh not available yet — collider may not work until updated.");
-            }
+            StartCoroutine(AssignColliderMeshAfterDelay(plane, viz));
         }
     }
+
+    IEnumerator AssignColliderMeshAfterDelay(ARPlane plane, ARPlaneMeshVisualizer viz)
+    {
+        yield return new WaitForSeconds(0.5f); // let ARKit update mesh
+
+        var collider = plane.GetComponent<MeshCollider>();
+        if (collider == null)
+            collider = plane.gameObject.AddComponent<MeshCollider>();
+
+        if (viz.mesh != null)
+        {
+            collider.sharedMesh = viz.mesh;
+            Debug.Log($"[PlaneVisualizer] Collider assigned to plane {plane.trackableId}");
+        }
+        else
+        {
+            Debug.LogWarning($"[PlaneVisualizer] Mesh still null after delay for plane {plane.trackableId}");
+        }
+    }
+
 
 
 #pragma warning restore CS0618
