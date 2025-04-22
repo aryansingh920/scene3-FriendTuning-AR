@@ -120,6 +120,7 @@ public class CharacterPlacer : MonoBehaviour
             Rigidbody rb = cube.AddComponent<Rigidbody>();
             rb.mass = 1f;
             rb.useGravity = true; // or false depending on your use case
+            rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
 
             Debug.Log($"[CharacterPlacer] Update: Spawned TestCube at {position}.");

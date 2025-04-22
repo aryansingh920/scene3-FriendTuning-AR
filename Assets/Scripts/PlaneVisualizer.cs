@@ -14,6 +14,7 @@ public class PlaneVisualizer : MonoBehaviour
     private bool enableCharacterPlacement = true;
 
     private ARPlaneManager _planeManager;
+
     private CharacterPlacer _characterPlacer;
 
     void Awake()
@@ -126,78 +127,57 @@ public class PlaneVisualizer : MonoBehaviour
 #pragma warning disable CS0618
     void OnPlanesChanged(ARPlanesChangedEventArgs args)
     {
-        // Debug.Log($"[PlaneVisualizer] OnPlanesChanged: Planes changed event triggered. Added: {args.added.Count}, Updated: {args.updated.Count}, Removed: {args.removed.Count}");
-
         foreach (var plane in args.added)
         {
-            // Debug.Log($"[PlaneVisualizer] OnPlanesChanged: New plane {plane.trackableId} alignment {plane.alignment}, position {plane.transform.position}, rotation {plane.transform.rotation.eulerAngles}");
-
-            // Add MeshFilter if missing
+            // Ensure MeshFilter exists
             if (!plane.TryGetComponent<MeshFilter>(out _))
-            {
-                // Debug.Log($"[PlaneVisualizer] OnPlanesChanged: Adding MeshFilter to plane {plane.trackableId}");
                 plane.gameObject.AddComponent<MeshFilter>();
-            }
-            else
-            {
-                // Debug.Log($"[PlaneVisualizer] OnPlanesChanged: Plane {plane.trackableId} already has MeshFilter.");
-            }
 
-            // Add ARPlaneMeshVisualizer if missing
+            // Ensure ARPlaneMeshVisualizer exists
             var viz = plane.GetComponent<ARPlaneMeshVisualizer>();
             if (viz == null)
-            {
-                // Debug.Log($"[PlaneVisualizer] OnPlanesChanged: Adding ARPlaneMeshVisualizer to plane {plane.trackableId}");
                 viz = plane.gameObject.AddComponent<ARPlaneMeshVisualizer>();
-            }
-            else
-            {
-                // Debug.Log($"[PlaneVisualizer] OnPlanesChanged: Plane {plane.trackableId} already has ARPlaneMeshVisualizer.");
-            }
 
-            // Add MeshRenderer if missing
+            // Ensure MeshRenderer exists
             var mr = plane.GetComponent<MeshRenderer>();
             if (mr == null)
-            {
-                // Debug.Log($"[PlaneVisualizer] OnPlanesChanged: Adding MeshRenderer to plane {plane.trackableId}");
                 mr = plane.gameObject.AddComponent<MeshRenderer>();
-            }
-            else
-            {
-                // Debug.Log($"[PlaneVisualizer] OnPlanesChanged: Plane {plane.trackableId} already has MeshRenderer.");
-            }
 
             // Assign material based on alignment
             switch (plane.alignment)
             {
                 case PlaneAlignment.HorizontalUp:
-                    // Debug.Log($"[PlaneVisualizer] OnPlanesChanged: Plane {plane.trackableId} is HorizontalUp, assigning floorMat...");
                     mr.material = floorMat;
                     break;
                 case PlaneAlignment.Vertical:
-                    // Debug.Log($"[PlaneVisualizer] OnPlanesChanged: Plane {plane.trackableId} is Vertical, assigning wallMat...");
                     mr.material = wallMat;
                     break;
                 default:
-                    // Debug.Log($"[PlaneVisualizer] OnPlanesChanged: Plane {plane.trackableId} has unknown alignment, assigning floorMat as fallback...");
                     mr.material = floorMat;
                     break;
             }
 
-            if (mr.material == null)
+            mr.enabled = true;
+            viz.enabled = true;
+
+            // Ensure MeshCollider exists
+            var collider = plane.GetComponent<MeshCollider>();
+            if (collider == null)
+                collider = plane.gameObject.AddComponent<MeshCollider>();
+
+            // Assign mesh to collider if available
+            if (viz.mesh != null)
             {
-                // Debug.LogError($"[PlaneVisualizer] OnPlanesChanged: MeshRenderer material is null for plane {plane.trackableId}!");
+                collider.sharedMesh = viz.mesh;
+                collider.convex = false; // Convex false for static mesh collider
             }
             else
             {
-                // Debug.Log($"[PlaneVisualizer] OnPlanesChanged: Assigned material {mr.material.name} to plane {plane.trackableId}.");
+                Debug.LogWarning($"[PlaneVisualizer] Plane '{plane.trackableId}' mesh not available yet — collider may not work until updated.");
             }
-
-            // Always enable the renderer and visualizer
-            mr.enabled = true;
-            viz.enabled = true;
-            // Debug.Log($"[PlaneVisualizer] OnPlanesChanged: Enabled MeshRenderer and ARPlaneMeshVisualizer for plane {plane.trackableId}.");
         }
     }
+
+
 #pragma warning restore CS0618
 }
