@@ -16,7 +16,7 @@ public class PlaneVisualizer : MonoBehaviour
 
     private ARPlaneManager _planeManager;
 
-    private CharacterPlacer _characterPlacer;
+    private CubePlacer _cubePlacer;
 
     void Awake()
     {
@@ -45,46 +45,46 @@ public class PlaneVisualizer : MonoBehaviour
         if (floorMat == null) Debug.LogError("[PlaneVisualizer] Awake: FloorMaterial not found!");
         if (wallMat == null) Debug.LogError("[PlaneVisualizer] Awake: WallMaterial not found!");
 
-        // Add CharacterPlacer component if needed
+        // Add CubePlacer component if needed
         if (enableCharacterPlacement)
         {
-            // Debug.Log("[PlaneVisualizer] Awake: enableCharacterPlacement is true, setting up CharacterPlacer...");
-            _characterPlacer = gameObject.GetComponent<CharacterPlacer>();
-            if (_characterPlacer == null)
+            // Debug.Log("[PlaneVisualizer] Awake: enableCharacterPlacement is true, setting up CubePlacer...");
+            _cubePlacer = gameObject.GetComponent<CubePlacer>();
+            if (_cubePlacer == null)
             {
-                // Debug.Log("[PlaneVisualizer] Awake: CharacterPlacer component not found, adding it...");
-                _characterPlacer = gameObject.AddComponent<CharacterPlacer>();
-                // Debug.Log("[PlaneVisualizer] Awake: CharacterPlacer component added.");
+                // Debug.Log("[PlaneVisualizer] Awake: CubePlacer component not found, adding it...");
+                _cubePlacer = gameObject.AddComponent<CubePlacer>();
+                // Debug.Log("[PlaneVisualizer] Awake: CubePlacer component added.");
             }
             else
             {
-                // Debug.Log("[PlaneVisualizer] Awake: CharacterPlacer component already exists.");
+                // Debug.Log("[PlaneVisualizer] Awake: CubePlacer component already exists.");
             }
 
             // Set the character prefab if it's assigned here
             if (characterPrefab != null)
             {
-                // Debug.Log("[PlaneVisualizer] Awake: characterPrefab is assigned, setting it on CharacterPlacer...");
-                var fieldInfo = typeof(CharacterPlacer).GetField("characterPrefab",
+                // Debug.Log("[PlaneVisualizer] Awake: characterPrefab is assigned, setting it on CubePlacer...");
+                var fieldInfo = typeof(CubePlacer).GetField("characterPrefab",
                     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
                 if (fieldInfo != null)
                 {
-                    fieldInfo.SetValue(_characterPlacer, characterPrefab);
-                    // Debug.Log("[PlaneVisualizer] Awake: Successfully set characterPrefab on CharacterPlacer.");
+                    fieldInfo.SetValue(_cubePlacer, characterPrefab);
+                    // Debug.Log("[PlaneVisualizer] Awake: Successfully set characterPrefab on CubePlacer.");
                 }
                 else
                 {
-                    // Debug.LogError("[PlaneVisualizer] Awake: Failed to set characterPrefab on CharacterPlacer via reflection!");
+                    // Debug.LogError("[PlaneVisualizer] Awake: Failed to set characterPrefab on CubePlacer via reflection!");
                 }
             }
             else
             {
-                // Debug.LogWarning("[PlaneVisualizer] Awake: characterPrefab is null, CharacterPlacer will need to have it assigned in Inspector!");
+                // Debug.LogWarning("[PlaneVisualizer] Awake: characterPrefab is null, CubePlacer will need to have it assigned in Inspector!");
             }
         }
         else
         {
-            // Debug.Log("[PlaneVisualizer] Awake: enableCharacterPlacement is false, skipping CharacterPlacer setup.");
+            // Debug.Log("[PlaneVisualizer] Awake: enableCharacterPlacement is false, skipping CubePlacer setup.");
         }
     }
 
