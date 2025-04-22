@@ -548,6 +548,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1392089545}
   - component: {fileID: 1392089544}
+  - component: {fileID: 1392089546}
   m_Layer: 0
   m_Name: PlaneVisualizer
   m_TagString: Untagged
@@ -562,7 +563,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1392089543}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fd0d8d11c59d44da89e5613d8857d5c0, type: 3}
   m_Name: 
@@ -570,7 +571,7 @@ MonoBehaviour:
   floorMat: {fileID: 2100000, guid: 15645386c254043b19999018292a909b, type: 2}
   wallMat: {fileID: 2100000, guid: 483a449aec3d44feb95fcf631ee3fb35, type: 2}
   characterPrefab: {fileID: 919132149155446097, guid: 30c296ba61d2b4296a0477cd52e4817a, type: 3}
-  enableCharacterPlacement: 1
+  enableCharacterPlacement: 0
 --- !u!4 &1392089545
 Transform:
   m_ObjectHideFlags: 0
@@ -586,6 +587,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1392089546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1392089543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f28246f4022b44ab8bb02d9cde60785a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  floorMat: {fileID: 2100000, guid: 15645386c254043b19999018292a909b, type: 2}
+  wallMat: {fileID: 2100000, guid: 483a449aec3d44feb95fcf631ee3fb35, type: 2}
+  characterPrefab: {fileID: 919132149155446097, guid: 30c296ba61d2b4296a0477cd52e4817a, type: 3}
+  enableCharacterPlacement: 1
 --- !u!1 &1671443795
 GameObject:
   m_ObjectHideFlags: 0
