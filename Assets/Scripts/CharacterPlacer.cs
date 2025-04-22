@@ -11,91 +11,118 @@ public class CharacterPlacer : MonoBehaviour
     private ARRaycastManager raycastManager;
     private ARPlaneManager planeManager;
     private List<ARRaycastHit> hits = new List<ARRaycastHit>();
+    private Material debugMaterial;
 
     void Start()
     {
-        raycastManager = FindFirstObjectByType<ARRaycastManager>();
-        planeManager = FindFirstObjectByType<ARPlaneManager>();
+        Debug.Log("[CharacterPlacer] Start: Starting initialization...");
 
+        raycastManager = FindFirstObjectByType<ARRaycastManager>();
         if (raycastManager == null)
         {
-            Debug.LogError("[CharacterPlacer] No ARRaycastManager found in scene!");
+            Debug.LogError("[CharacterPlacer] Start: No ARRaycastManager found! Disabling.");
             enabled = false;
+            return;
         }
 
+        planeManager = FindFirstObjectByType<ARPlaneManager>();
         if (planeManager == null)
         {
-            Debug.LogError("[CharacterPlacer] No ARPlaneManager found in scene!");
+            Debug.LogError("[CharacterPlacer] Start: No ARPlaneManager found! Disabling.");
             enabled = false;
+            return;
         }
 
         if (characterPrefab == null)
         {
-            Debug.LogError("[CharacterPlacer] Character prefab not assigned!");
+            Debug.LogError("[CharacterPlacer] Start: Character prefab not assigned! Disabling.");
             enabled = false;
+            return;
         }
+
+        // Load material from Resources
+        debugMaterial = Resources.Load<Material>("Materials/DebugMaterial");
+        if (debugMaterial == null)
+        {
+            Debug.LogError("[CharacterPlacer] Start: Could not load DebugMaterial from Resources/Materials!");
+        }
+        else
+        {
+            Debug.Log("[CharacterPlacer] Start: Successfully loaded DebugMaterial.");
+        }
+
+        // Optionally reset AR session
+        var arSession = FindFirstObjectByType<ARSession>();
+        if (arSession != null)
+        {
+            Debug.Log("[CharacterPlacer] Start: Resetting ARSession...");
+            arSession.Reset();
+        }
+        else
+        {
+            Debug.LogWarning("[CharacterPlacer] Start: ARSession not found.");
+        }
+
+        Debug.Log("[CharacterPlacer] Start: Initialization complete.");
     }
 
     void Update()
     {
-        // Check for screen touches
-        if (Input.touchCount > 0)
+        if (Input.touchCount == 0) return;
+
+        Touch touch = Input.GetTouch(0);
+        if (touch.phase != TouchPhase.Began) return;
+
+        if (raycastManager.Raycast(touch.position, hits, TrackableType.PlaneWithinPolygon))
         {
-            Touch touch = Input.GetTouch(0);
+            ARRaycastHit hit = hits[0];
+            Pose hitPose = hit.pose;
 
-            // Only process touch began phase
-            if (touch.phase == TouchPhase.Began)
+            ARPlane plane = planeManager.GetPlane(hit.trackableId);
+            if (plane == null || !plane.gameObject.activeSelf)
             {
-                // Raycast against planes
-                if (raycastManager.Raycast(touch.position, hits, TrackableType.PlaneWithinPolygon))
-                {
-                    // Get the first hit
-                    ARRaycastHit hit = hits[0];
-
-                    // Check if the hit plane is enabled/active
-                    ARPlane plane = null;
-                    foreach (var p in planeManager.trackables)
-                    {
-                        if (p.trackableId == hit.trackableId)
-                        {
-                            plane = p;
-                            break;
-                        }
-                    }
-
-                    // Only place character if plane is valid
-                    if (plane != null && plane.gameObject.activeSelf)
-                    {
-                        // Create position from hit pose
-                        Vector3 positionInWorld = hit.pose.position;
-
-                        // Instantiate character at the hit position
-                        // For horizontal planes, just use the hit position
-                        // For vertical planes, adjust position to make character "stand" against the wall
-                        if (plane.alignment == PlaneAlignment.Vertical)
-                        {
-                            // For vertical planes, make the character face the plane normal
-                            Quaternion rotation = Quaternion.LookRotation(-hit.pose.up, Vector3.up);
-                            Instantiate(characterPrefab, positionInWorld, rotation);
-                            Debug.Log($"[CharacterPlacer] Placed character on vertical plane {plane.trackableId}");
-                        }
-                        else if (plane.alignment == PlaneAlignment.HorizontalUp)
-                        {
-                            // For floor planes, use original rotation 
-                            // (assuming character's forward is already correctly aligned in the prefab)
-                            Quaternion rotation = Quaternion.Euler(0, hit.pose.rotation.eulerAngles.y, 0);
-                            Instantiate(characterPrefab, positionInWorld, rotation);
-                            Debug.Log($"[CharacterPlacer] Placed character on floor plane {plane.trackableId}");
-                        }
-                        else
-                        {
-                            // Default case
-                            Instantiate(characterPrefab, positionInWorld, hit.pose.rotation);
-                            Debug.Log($"[CharacterPlacer] Placed character on other plane {plane.trackableId}");
-                        }
-                    }
-                }
+                Debug.LogWarning("[CharacterPlacer] Update: Inactive or missing plane.");
+                return;
             }
+
+            Quaternion rotation = Quaternion.identity;
+            Vector3 position = hitPose.position;
+
+            if (plane.alignment == PlaneAlignment.Vertical)
+            {
+                rotation = Quaternion.LookRotation(-plane.transform.forward, Vector3.up);
+            }
+            else if (plane.alignment == PlaneAlignment.HorizontalUp)
+            {
+                position.y += 0.1f;
+            }
+            else
+            {
+                rotation = hitPose.rotation;
+            }
+
+            GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            cube.transform.position = position;
+            cube.transform.rotation = rotation;
+            cube.transform.localScale = Vector3.one * 0.1f;
+            cube.name = "TestCube";
+
+            if (debugMaterial != null)
+            {
+                cube.GetComponent<Renderer>().material = debugMaterial;
+            }
+            else
+            {
+                Debug.LogWarning("[CharacterPlacer] Update: DebugMaterial not loaded, cube will use default.");
+            }
+
+            // Add physics
+            Rigidbody rb = cube.AddComponent<Rigidbody>();
+            rb.mass = 1f;
+            rb.useGravity = true; // or false depending on your use case
+
+
+            Debug.Log($"[CharacterPlacer] Update: Spawned TestCube at {position}.");
         }
     }
 }
