@@ -143,10 +143,6 @@ PlayerSettings:
   bundleVersion: 0.1.0
   preloadedAssets:
   - {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  - {fileID: 4800000, guid: e7c77f6eaab324a819efdc13b8125a39, type: 3}
-  - {fileID: 4800000, guid: 6743a50a812740be8c0aa3fccc46fae9, type: 3}
-  - {fileID: -3632380273549931238, guid: 1848f6e0fb5a24473941c4688622e22e, type: 2}
-  - {fileID: 11400000, guid: 3670f44f0460d4703a65c497be0a105e, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -170,7 +166,7 @@ PlayerSettings:
   applicationIdentifier:
     Android: com.UnityTechnologies.com.unity.template.urpblank
     Standalone: com.Unity-Technologies.com.unity.template.urp-blank
-    iPhone: com.Unity-Technologies.com.unity.template.urp-blank
+    iPhone: com.aryansingh.ar
   buildNumber:
     Standalone: 0
     VisionOS: 0
@@ -568,7 +564,8 @@ PlayerSettings:
   enableCrashReportAPI: 0
   cameraUsageDescription: We need access to your camera for AR experience.
   locationUsageDescription: 
-  microphoneUsageDescription: 
+  microphoneUsageDescription: This app requires microphone access to record your
+    voice for interaction.
   bluetoothUsageDescription: 
   macOSTargetOSVersion: 11.0
   switchNMETAOverride: 

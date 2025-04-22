@@ -18,6 +18,9 @@ public class PlaneVisualizerCharacter : MonoBehaviour
 
     private CharacterPlacer _characterPlacer;
 
+    [SerializeField] private GameObject webSocketHandlerPrefab;
+    [SerializeField] private GameObject micButtonPrefab;
+
     void Awake()
     {
         Debug.Log("[PlaneVisualizer] Awake: Starting initialization...");
@@ -86,6 +89,31 @@ public class PlaneVisualizerCharacter : MonoBehaviour
         {
             // Debug.Log("[PlaneVisualizer] Awake: enableCharacterPlacement is false, skipping CharacterPlacer setup.");
         }
+
+        // Instantiate WebSocket Handler
+        if (webSocketHandlerPrefab != null)
+        {
+            Instantiate(webSocketHandlerPrefab); // It has BuiltinWebSocketAudioSender on it
+            Debug.Log("[SceneInitializer] WebSocket handler instantiated.");
+        }
+        else
+        {
+            Debug.LogError("[SceneInitializer] Missing webSocketHandlerPrefab!");
+        }
+
+        // Instantiate Mic UI Handler
+        if (micButtonPrefab != null)
+        {
+            GameObject micHandler = new GameObject("MicRecordHandler", typeof(MicRecordHandler));
+            var handler = micHandler.GetComponent<MicRecordHandler>();
+            handler.micButtonPrefab = micButtonPrefab;
+            Debug.Log("[SceneInitializer] MicRecordHandler initialized.");
+        }
+        else
+        {
+            Debug.LogError("[SceneInitializer] Missing micButtonPrefab!");
+        }
+
     }
 
     void OnEnable()
