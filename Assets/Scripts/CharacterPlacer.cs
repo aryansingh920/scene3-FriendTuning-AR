@@ -6,19 +6,20 @@ using System.Collections.Generic;
 [RequireComponent(typeof(ARRaycastManager))]
 public class CharacterPlacer : MonoBehaviour
 {
-    // If you’ve already wired a prefab in the Inspector you can skip the Resources.Load
     [SerializeField] private GameObject characterPrefab;
 
     private ARRaycastManager raycastManager;
     private ARPlaneManager planeManager;
     private List<ARRaycastHit> hits = new List<ARRaycastHit>();
+    private GameObject placedCharacter;
+    private Camera mainCamera;
 
     void Start()
     {
         raycastManager = GetComponent<ARRaycastManager>();
         planeManager = FindFirstObjectByType<ARPlaneManager>();
+        mainCamera = Camera.main;
 
-        // fallback to Resources if you didn’t assign in the Editor
         if (characterPrefab == null)
         {
             characterPrefab = Resources.Load<GameObject>("Characters/boy");
@@ -43,23 +44,29 @@ public class CharacterPlacer : MonoBehaviour
             var pose = hit.pose;
 
             var plane = planeManager.GetPlane(hit.trackableId);
-            if (plane == null || !plane.gameObject.activeSelf)
+            if (plane == null || !plane.gameObject.activeSelf) return;
+
+            // adjust orientation if needed
+            if (plane.alignment == PlaneAlignment.HorizontalUp)
+                pose.position += Vector3.up * 0.05f; // small lift for realism
+
+            if (placedCharacter == null)
             {
-                Debug.LogWarning("[CharacterPlacer] Hit inactive or missing plane.");
-                return;
+                placedCharacter = Instantiate(characterPrefab, pose.position, Quaternion.identity);
+                placedCharacter.name = "ARCharacter";
+                placedCharacter.transform.localScale = Vector3.one * 0.5f;
+            }
+            else
+            {
+                placedCharacter.transform.position = pose.position;
             }
 
-            // adjust orientation & height if you need
-            if (plane.alignment == PlaneAlignment.HorizontalUp)
-                pose.position += Vector3.up * 0.1f;
-            else if (plane.alignment == PlaneAlignment.Vertical)
-                pose.rotation = Quaternion.LookRotation(-plane.transform.forward);
+            // make it always face the camera
+            Vector3 directionToCamera = mainCamera.transform.position - placedCharacter.transform.position;
+            directionToCamera.y = 0; // keep it on same horizontal plane
+            placedCharacter.transform.rotation = Quaternion.LookRotation(directionToCamera.normalized);
 
-            // instantiate your character prefab
-            var go = Instantiate(characterPrefab, pose.position, pose.rotation);
-            go.name = "ARCharacter";
-
-            Debug.Log($"[CharacterPlacer] Spawned {go.name} at {pose.position}.");
+            Debug.Log($"[CharacterPlacer] Placed/moved ARCharacter at {pose.position}.");
         }
     }
 }
