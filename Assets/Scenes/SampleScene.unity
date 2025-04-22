@@ -569,7 +569,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   floorMat: {fileID: 2100000, guid: 15645386c254043b19999018292a909b, type: 2}
   wallMat: {fileID: 2100000, guid: 483a449aec3d44feb95fcf631ee3fb35, type: 2}
-  characterPrefab: {fileID: 1431720011828904642, guid: 05af2bb21746544efa88afd37a3d28c4, type: 3}
+  characterPrefab: {fileID: 919132149155446097, guid: 30c296ba61d2b4296a0477cd52e4817a, type: 3}
   enableCharacterPlacement: 1
 --- !u!4 &1392089545
 Transform:
